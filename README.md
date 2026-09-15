@@ -1,3 +1,5 @@
+[English](README.md) · [Русский](README.ru.md) · [Polski](README.pl.md)
+
 # Clearline Feedback Bot
 
 > A polished, multilingual Telegram feedback desk with private request history, transparent privacy messaging, and a protected administrator workspace.
