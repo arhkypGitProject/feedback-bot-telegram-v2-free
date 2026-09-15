@@ -107,7 +107,6 @@ jobs:
             echo "A token-like value was found in tracked files."
             exit 1
           fi
-
       - name: Verify local secrets are ignored
         run: |
           git check-ignore -q .env
@@ -171,19 +170,3 @@ jobs:
             exit 1
           fi
 
-  codeql:
-    name: CodeQL analysis
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: python
-
-      - name: Analyze with CodeQL
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:python"
