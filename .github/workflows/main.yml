@@ -1,0 +1,98 @@
+name: Feedback Bot CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+
+      - name: Compile Python sources
+        run: python -m compileall -q main.py bot
+
+      - name: Verify installed dependencies
+        run: python -m pip check
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Run application smoke test
+        env:
+          BOT_TOKEN: ci-test-token
+          ADMIN_IDS: "1"
+          DATABASE_PATH: data/ci.sqlite3
+        run: |
+          python - <<'PY'
+          from bot.config import load_settings
+          from bot.database import Database
+          from bot.handlers import admin, feedback, history, start
+
+          settings = load_settings()
+          database = Database(settings.database_path)
+          request_id = database.create_request(42, "CI validation request")
+          database.set_request_status(request_id, "closed")
+          routers = [
+              start.create_router(database, settings),
+              feedback.create_router(database, settings),
+              history.create_router(database, settings),
+              admin.create_router(database, settings),
+          ]
+
+          assert len(routers) == 4
+          assert len(database.list_requests("closed")) == 1
+          print("Smoke test passed")
+          PY
+
+      - name: Check documentation files
+        run: |
+          test -f README.md
+          test -f README.ru.md
+          test -f README.pl.md
+          test -f README.uk.md
+          test -f LICENSE
+          grep -q "README.uk.md" README.md
+          grep -q "README.uk.md" README.ru.md
+          grep -q "README.uk.md" README.pl.md
+          grep -q "README.pl.md" README.md
+          grep -q "README.pl.md" README.ru.md
+          grep -q "README.pl.md" README.uk.md
+
+      - name: Check tracked files for exposed bot tokens
+        run: |
+          if git grep -n -E '[0-9]{6,}:[A-Za-z0-9_-]{20,}' -- ':!tests'; then
+            echo "A token-like value was found in tracked files."
+            exit 1
+          fi
+
+      - name: Verify local secrets are ignored
+        run: |
+          git check-ignore -q .env
+          git check-ignore -q data/feedback.sqlite3
