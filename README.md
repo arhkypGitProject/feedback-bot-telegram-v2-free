@@ -1,5 +1,9 @@
 [English](README.md) · [Русский](README.ru.md) · [Polski](README.pl.md) · [Українська](README.uk.md)
 
+[![CI](https://github.com/arhkypGitProject/feedback-bot-telegram-v2-free/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/arhkypGitProject/feedback-bot-telegram-v2-free/actions/workflows/main.yml) [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/) [![License](https://img.shields.io/github/license/arhkypGitProject/feedback-bot-telegram-v2-free)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/arhkypGitProject/feedback-bot-telegram-v2-free?style=flat&logo=github)](https://github.com/arhkypGitProject/feedback-bot-telegram-v2-free/stargazers) [![Forks](https://img.shields.io/github/forks/arhkypGitProject/feedback-bot-telegram-v2-free?style=flat&logo=github)](https://github.com/arhkypGitProject/feedback-bot-telegram-v2-free/network/members) [![Issues](https://img.shields.io/github/issues/arhkypGitProject/feedback-bot-telegram-v2-free)](https://github.com/arhkypGitProject/feedback-bot-telegram-v2-free/issues) [![Views](https://komarev.com/ghpvc/?username=arhkypGitProject&repo=feedback-bot-telegram-v2-free&color=2563EB&style=flat)](https://github.com/arhkypGitProject/feedback-bot-telegram-v2-free)
+[![Last commit](https://img.shields.io/github/last-commit/arhkypGitProject/feedback-bot-telegram-v2-free)](https://github.com/arhkypGitProject/feedback-bot-telegram-v2-free/commits/master) [![Repo size](https://img.shields.io/github/repo-size/arhkypGitProject/feedback-bot-telegram-v2-free)](https://github.com/arhkypGitProject/feedback-bot-telegram-v2-free)
+
 # Clearline Feedback Bot
 
 > A polished, multilingual Telegram feedback desk with private request history, transparent privacy messaging, and a protected administrator workspace.
