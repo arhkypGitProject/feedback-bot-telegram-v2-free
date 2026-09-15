@@ -1,6 +1,7 @@
 name: Feedback Bot CI
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -12,6 +13,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: feedback-bot-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
