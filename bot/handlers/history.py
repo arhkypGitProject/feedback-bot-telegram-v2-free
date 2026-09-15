@@ -1,6 +1,6 @@
 import html
 
-from aiogram import F, Router
+from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 
@@ -17,7 +17,11 @@ def create_router(database: Database, settings: Settings) -> Router:
         user_id = target.from_user.id
         language = database.get_language(user_id)
         requests = database.list_user_requests(user_id)
-        text = get_text(language, "history_empty") if not requests else get_text(language, "history_title")
+        text = (
+            get_text(language, "history_empty")
+            if not requests
+            else get_text(language, "history_title")
+        )
         markup = history_menu(requests) if requests else None
         if isinstance(target, CallbackQuery):
             await target.message.edit_text(text, reply_markup=markup)
@@ -33,7 +37,9 @@ def create_router(database: Database, settings: Settings) -> Router:
     async def history_button(callback: CallbackQuery) -> None:
         await show_history(callback)
 
-    @router.callback_query(lambda query: query.data and query.data.startswith("request:"))
+    @router.callback_query(
+        lambda query: query.data and query.data.startswith("request:")
+    )
     async def request_detail(callback: CallbackQuery) -> None:
         request_id = int(callback.data.split(":", 1)[1])
         request = database.get_request(request_id)
@@ -41,9 +47,21 @@ def create_router(database: Database, settings: Settings) -> Router:
             await callback.answer("Request not found", show_alert=True)
             return
         language = database.get_language(callback.from_user.id)
-        conversation = "\n".join(f"<b>{'You' if item['author_role'] == 'user' else 'Support'}</b> [{item['created_at']}]\n{html.escape(item['body'])}" for item in database.get_messages(request_id))
+        conversation = "\n".join(
+            f"<b>{'You' if item['author_role'] == 'user' else 'Support'}</b> [{item['created_at']}]\n{html.escape(item['body'])}"
+            for item in database.get_messages(request_id)
+        )
         status = get_text(language, f"status_{request['status']}")
-        await callback.message.edit_text(get_text(language, "request_detail", request_id=request_id, status=status, created_at=request["created_at"], conversation=conversation))
+        await callback.message.edit_text(
+            get_text(
+                language,
+                "request_detail",
+                request_id=request_id,
+                status=status,
+                created_at=request["created_at"],
+                conversation=conversation,
+            )
+        )
         await callback.answer()
 
     return router

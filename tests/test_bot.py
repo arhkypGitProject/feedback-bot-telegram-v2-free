@@ -1,7 +1,7 @@
 import os
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from bot.config import load_settings
@@ -30,7 +30,9 @@ class DatabaseTests(unittest.TestCase):
 
         self.assertEqual(self.database.get_request(request_id)["status"], "answered")
         self.assertEqual(len(self.database.get_messages(request_id)), 2)
-        self.assertEqual(self.database.get_messages(request_id)[1]["body"], "Support reply")
+        self.assertEqual(
+            self.database.get_messages(request_id)[1]["body"], "Support reply"
+        )
 
         self.database.set_request_status(request_id, "closed")
         self.assertEqual(len(self.database.list_requests("open")), 0)
@@ -65,7 +67,9 @@ class LocalizationTests(unittest.TestCase):
 class InterfaceTests(unittest.TestCase):
     def test_main_menu_contains_user_actions(self) -> None:
         menu = main_menu("ru", is_admin=True)
-        callbacks = [button.callback_data for row in menu.inline_keyboard for button in row]
+        callbacks = [
+            button.callback_data for row in menu.inline_keyboard for button in row
+        ]
 
         self.assertIn("feedback", callbacks)
         self.assertIn("history", callbacks)
@@ -75,11 +79,17 @@ class InterfaceTests(unittest.TestCase):
 
     def test_language_and_admin_menus_have_expected_callbacks(self) -> None:
         languages = language_menu()
-        language_callbacks = [button.callback_data for row in languages.inline_keyboard for button in row]
-        self.assertEqual(set(language_callbacks), {f"lang:{code}" for code in LANGUAGES})
+        language_callbacks = [
+            button.callback_data for row in languages.inline_keyboard for button in row
+        ]
+        self.assertEqual(
+            set(language_callbacks), {f"lang:{code}" for code in LANGUAGES}
+        )
 
         admin = admin_menu([{"id": 3, "status": "open"}], "en")
-        admin_callbacks = [button.callback_data for row in admin.inline_keyboard for button in row]
+        admin_callbacks = [
+            button.callback_data for row in admin.inline_keyboard for button in row
+        ]
         self.assertIn("admin_list:open", admin_callbacks)
         self.assertIn("admin_list:closed", admin_callbacks)
         self.assertIn("admin_list:all", admin_callbacks)
@@ -88,13 +98,27 @@ class InterfaceTests(unittest.TestCase):
 
 class ConfigurationTests(unittest.TestCase):
     def test_settings_require_admin_id(self) -> None:
-        with patch.dict(os.environ, {"BOT_TOKEN": "test-token", "ADMIN_IDS": ""}, clear=False):
-            with self.assertRaisesRegex(RuntimeError, "ADMIN_IDS"):
-                load_settings()
+        test_token = os.environ.get("CI_TEST_TOKEN", "placeholder")
+        with (
+            patch.dict(
+                os.environ, {"BOT_TOKEN": test_token, "ADMIN_IDS": ""}, clear=False
+            ),
+            self.assertRaisesRegex(RuntimeError, "ADMIN_IDS"),
+        ):
+            load_settings()
 
     def test_all_routers_can_be_created(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
-            with patch.dict(os.environ, {"BOT_TOKEN": "test-token", "ADMIN_IDS": "1", "DATABASE_PATH": str(Path(temp_dir) / "ci.sqlite3")}, clear=False):
+            test_token = os.environ.get("CI_TEST_TOKEN", "placeholder")
+            with patch.dict(
+                os.environ,
+                {
+                    "BOT_TOKEN": test_token,
+                    "ADMIN_IDS": "1",
+                    "DATABASE_PATH": str(Path(temp_dir) / "ci.sqlite3"),
+                },
+                clear=False,
+            ):
                 settings = load_settings()
                 database = Database(settings.database_path)
                 routers = [
